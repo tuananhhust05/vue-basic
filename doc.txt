@@ -1,0 +1,315 @@
+
+--------------
+Quick start:
+https://vuejs.org/guide/quick-start.html
+
+npm create vue@latest project1
+
+This project is create by vite 
+
+--------------
+- Config port: 
+  + Edit file vite.config.js
+        import { fileURLToPath, URL } from 'node:url'
+        import { defineConfig } from 'vite'
+        import vue from '@vitejs/plugin-vue' 
+        export default defineConfig({
+            plugins: [
+                vue(),
+            ],
+            server:{
+                port:3000
+            },
+            resolve: {
+                alias: {
+                '@': fileURLToPath(new URL('./src', import.meta.url))
+                }
+            }
+        })
+
+--------------
+- Structure of project 
+  + index.html: root file include main.js
+  + main.js: define app  vue ( include App.vue )
+  + 
+
+-------------
+- Import components 
+<script setup>
+import HelloWorld from './components/HelloWorld.vue'
+import TheWelcome from './components/TheWelcome.vue'
+</script>
+- Export components 
+Each file are component, we don't need to export 
+
+-------------
+- Return html and imported components 
+<template>
+  <header>
+    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <div class="wrapper">
+      <HelloWorld msg="You did it!" />
+    </div>
+  </header>
+  <main>
+    <TheWelcome />
+  </main>
+</template>
+
+
+-------------
+- Config css 
+<style scoped>
+    header {
+      line-height: 1.5;
+    }
+</style>
+
+
+------------
+- config prop 
+<script setup>
+defineProps({  // prop from parents component
+  msg: {
+    type: String,
+    required: true
+  }
+})
+</script>
+
+------------
+- Simple example 
+- render data 
+  <script>
+    export default {
+      data(){
+        return {
+          name:"John Doe",
+          status:false
+        }
+      }
+    }
+  </script>
+
+  <template>
+    <h1>{{name}}</h1>
+  </template>
+
+- insert js logic 
+<template>
+  <h1>{{status && name}}</h1>
+</template>
+
+// handle logic 
+- v-if : show elements base on status 
+  <p v-if="status">User is active </p>
+
+<template>
+  <h1>{{status && name}}</h1>
+  <p v-if="status === 'active'">User is active</p>
+  <p v-else-if="status === 'pending'">User is pending</p>
+  <p v-if="status === 'inactive'">User is inactive</p>
+</template>
+
+
+------------
+- v-for 
+  <ul>
+       <li v-for="task in tasks" :key="task">{{task}}</li>
+  </ul>
+  this principle is different from react 
+
+- v-bind : used for generate data in link 
+  <a v-bind:href="link">Click for QLDT</a>
+  <a :href="link">Click for QLDT</a>
+
+------------
+- event v-on
+    <button v-on:click="togggleStatus">Click me!</button>
+    <button @click="togggleStatus">Click me!</button>
+    <script>
+    export default {
+        data(){
+          return {
+            name:"John Doe",
+            status:'active',
+            tasks:['vue','webpack','vite','docker','kubernet'],
+            link:'https://qldt.hust.edu.vn'
+          }
+        },
+        methods:{
+          togggleStatus(){
+            console.log(this.status); // access to state 
+          }
+        }
+      }
+    </script>
+
+------------
+- final code: 
+  <script>
+    export default {
+      data(){
+        return {
+          name:"John Doe",
+          status:'active',
+          tasks:['vue','webpack','vite','docker','kubernet'],
+          link:'https://qldt.hust.edu.vn'
+        }
+      },
+      methods:{
+        togggleStatus(){
+          console.log(this.status);
+        }
+      }
+    }
+  </script>
+
+  <template>
+    <h1>{{status && name}}</h1>
+    <p v-if="status === 'active'">User is active</p>
+    <p v-else-if="status === 'pending'">User is pending</p>
+    <p v-if="status === 'inactive'">User is inactive</p>
+    <ul>
+        <li v-for="task in tasks" :key="task">{{task}}</li>
+    </ul>
+    <a v-bind:href="link">Click for QLDT</a>
+    <a :href="link">Click for QLDT</a>
+    <button v-on:click="togggleStatus">Click me!</button>
+    <button @click="togggleStatus">Click me!</button>
+  </template>
+
+------------
+- other presentation 
+
+    import { ref, onMounted } from 'vue';
+
+    const name = ref('John Doe'); // use ref to change value 
+    const status = ref('active');
+    const tasks = ref(['Task One', 'Task Two', 'Task Three']);
+    const newTask = ref('');
+
+    const toggleStatus = () => {
+      if (status.value === 'active') {
+        status.value = 'pending';
+      } else if (status.value === 'pending') {
+        status.value = 'inactive';
+      } else {
+        status.value = 'active';
+      }
+    };
+
+    const addTask = () => {
+      if (newTask.value.trim() !== '') {
+        tasks.value.push(newTask.value);
+        newTask.value = '';
+      }
+    };
+
+    const deleteTask = (index) => {
+      tasks.value.splice(index, 1);
+    };
+    
+    // init when load page 
+    onMounted(async () => {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos');
+        const data = await response.json();
+        tasks.value = data.map((task) => task.title);
+      } catch (error) {
+        console.log('Error fetching tasks');
+      }
+    });
+    </script>
+
+    <template>
+      <h1>{{ name }}</h1>
+      <p v-if="status === 'active'">User is active</p>
+      <p v-else-if="status === 'pending'">User is pending</p>
+      <p v-else>User is inactive</p>
+
+      <form @submit.prevent="addTask">
+        <label for="newTask">Add Task</label>
+        <!-- listening changes of input -->
+        <input type="text" id="newTask" name="newTask" v-model="newTask" /> 
+        <button type="submit">Submit</button>
+      </form>
+
+      <h3>Tasks:</h3>
+      <ul>
+        <li v-for="(task, index) in tasks" :key="task">
+          <span>
+            {{ task }}
+          </span>
+          <button @click="deleteTask(index)">x</button>
+        </li>
+      </ul>
+      <br />
+      <!-- <button v-on:click="toggleStatus">Change Status</button> -->
+      <button @click="toggleStatus">Change Status</button>
+    </template>
+
+
+--------------
+
+Tailwind css vue 
+
+https://v2.tailwindcss.com/docs/guides/vue-3-vite
+
+npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+npx tailwindcss init -p // create file 
+
+// config tailwind config files
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+      },
+      gridTemplateColumns: {
+        '70/30': '70% 28%',
+      },
+    },
+  },
+  variants: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+
+- config in main.css 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+- import main.css in main.js
+import './assets/main.css';
+
+- must restart project to take config tailwind 
+
+--------------
+
+Router Link to redirect in single page 
+
+--------------
+- Import global css to main.js 
+import './assets/main.css';
+import 'primeicons/primeicons.css';
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
+import router from './router';
+
+--------------
+- Config router in main.js 
+
+
+
+
+
+
+
+
+
+
